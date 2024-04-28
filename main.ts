@@ -1,5 +1,5 @@
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    mySprite.setImage(assets.image`heroSideAttackRight0`)
+    mySprite.setImage(assets.image`いぬたぬき_右`)
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`ダイヤモンド`, function (sprite, location) {
     tiles.setTileAt(location, assets.tile`transparency16`)
@@ -12,7 +12,10 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`アイテムブロック3`, f
     get_item(7, 10)
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    mySprite.setImage(assets.image`heroSideAttackLeft4`)
+    mySprite.setImage(assets.image`いぬたぬき_左`)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
+    damage()
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`チェスト_開いてない`, function (sprite, location) {
     stage += 1
@@ -440,49 +443,9 @@ function init_stage (stage: number) {
             ................................................................................................................................................................
             ................................................................................................................................................................
             `)
-        sprites.destroy(mySprite)
-        mySprite3 = sprites.create(img`
-            bbbb........bbbb.................
-            c99bb......bb99b.................
-            c999bb....bb999c.................
-            c9b99bccccb99b9c.................
-            c9bb99bccb99bb9c.................
-            c93b99999999b39c.................
-            c93399999999339c.................
-            c99399999999399c.................
-            c99999991199999c.................
-            c999ff91119ff99c........bbbbbb...
-            c999ff91111ff99c.......c999999bb.
-            c99991111111999c......c99999999b.
-            c9991111fff1199c.....c9991119999b
-            c999c11fff1199bc.....c9911111999b
-            c999cc111111c9bc.....c911dd11199b
-            c99999bb33cc99bcc....cbddbbd1199c
-            c999999b33c99999bbccccbbdbbb1199c
-            c9999999bb9999999999999999bb1999c
-            c999911119999999999999999999b999c
-            c999111111999999999999999999999c.
-            c99911111119999999999999999999cc.
-            c99111111119999999999999999999c..
-            c99111111111999999999999999999c..
-            cb9111111111999999999999999999c..
-            .f9111111111999999999999999999c..
-            .ff111111111999999999999999999c..
-            ..fb11111111999999999999999999c..
-            ...fb1111119999999111111999999c..
-            ...fbbb11119999991111111199999c..
-            ....fbbfffb9999ccccccccccb9999c..
-            ....fbbf..f999c.....fbbf.c9999c..
-            ....fbbf..f999c.....fbbf.cc9999c.
-            ....fbbf..f99c.......fbf..cc999c.
-            ....fbbf..f99c.......fbbf..cc99c.
-            ....fbbf..f99c.......fbbf...c99c.
-            ....fbbf..f99c......fbbbf...c99c.
-            ...fbbbf..f99c......ffff....cb9c.
-            ...fbbf..f999c.............c999c.
-            ...ffff..f99cc.............c999c.
-            .........fffc..............cccc..
-            `, SpriteKind.Enemy)
+        tiles.placeOnTile(mySprite, tiles.getTileLocation(3, 10))
+        sprites.destroy(mySprite3)
+        mySprite3 = sprites.create(assets.image`TNT`, SpriteKind.Enemy)
         tiles.placeOnTile(mySprite3, tiles.getTileLocation(15, 11))
         mySprite3.ay = 500
         boss_move = 0
@@ -510,6 +473,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         mySprite.vy = -300
     }
 })
+let projectile: Sprite = null
 let i = 0
 let boss_move = 0
 let mySprite3: Sprite = null
@@ -517,10 +481,11 @@ let j = 0
 let mySprite2: Sprite = null
 let mySprite: Sprite = null
 let stage = 0
+stage = 4
 info.setScore(0)
 info.setLife(3)
-stage = 0
-mySprite = sprites.create(assets.image`heroSideAttackRight0`, SpriteKind.Player)
+stage = 6
+mySprite = sprites.create(assets.image`いぬたぬき_右`, SpriteKind.Player)
 controller.moveSprite(mySprite, 100, 0)
 scene.cameraFollowSprite(mySprite)
 mySprite.ay = 500
@@ -567,6 +532,28 @@ game.onUpdate(function () {
         tiles.setTileAt(tiles.getTileLocation(17, 10), assets.tile`アイテムブロック2`)
         tiles.setWallAt(tiles.getTileLocation(17, 10), true)
         get_item(17, 10)
+    }
+})
+game.onUpdateInterval(0.01, function () {
+    if (stage == 6) {
+        projectile = sprites.createProjectileFromSprite(img`
+            . . 2 2 b b b b b . . . . . . . 
+            . 2 b 4 4 4 4 4 4 b . . . . . . 
+            2 2 4 4 4 4 d d 4 4 b . . . . . 
+            2 b 4 4 4 4 4 4 d 4 b . . . . . 
+            2 b 4 4 4 4 4 4 4 d 4 b . . . . 
+            2 b 4 4 4 4 4 4 4 4 4 b . . . . 
+            2 b 4 4 4 4 4 4 4 4 4 e . . . . 
+            2 2 b 4 4 4 4 4 4 4 b e . . . . 
+            . 2 b b b 4 4 4 b b b e . . . . 
+            . . e b b b b b b b e e . . . . 
+            . . . e e b 4 4 b e e e b . . . 
+            . . . . . e e e e e e b d b b . 
+            . . . . . . . . . . . b 1 1 1 b 
+            . . . . . . . . . . . c 1 d d b 
+            . . . . . . . . . . . c 1 b c . 
+            . . . . . . . . . . . . c c . . 
+            `, mySprite3, randint(-50, 0), randint(-50, 0))
     }
 })
 forever(function () {
